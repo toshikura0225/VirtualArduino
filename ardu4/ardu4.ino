@@ -110,14 +110,16 @@ void setup() {
   delay(1000);      // 電源ON/OFFの繰り返した場合の連続的なEEPROM読込みを回避するため
   
   // ▲▲▲保留（設定は記憶されず初期値で動作するものとする）▲▲▲
-  getEEPROM();      // EEPROMからすべての設定値を読込み（制御設定値＆汎用記憶メモリ）
+  //getEEPROM();      // EEPROMからすべての設定値を読込み（制御設定値＆汎用記憶メモリ）
   
   // ポートの入出力方向を設定（デジタルピンのみ、アナログピンはアナログとして使用する場合は設定不要）
   for (int i = 2; i <= 13; i++) {  pinMode(i, pinDirection[i]);  digitalWrite(i, LOW); };
   
   // 制御用シリアル通信開始
+  // ▲▲▲時にボーレートは9600固定とする
   eepBaudRateCode = EEPROM.read(two2one(HREGIST_EEP_INIT_DATA, LREGIST_EEP_BAUD_RATE_CODE));
-  Serial.begin(code2baudrate(eepBaudRateCode));
+  // Serial.begin(code2baudrate(eepBaudRateCode));
+  Serial.begin(9600);
 }
 
 // the loop routine runs over and over again forever:
