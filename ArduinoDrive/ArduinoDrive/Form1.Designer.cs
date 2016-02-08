@@ -539,7 +539,7 @@
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 136F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 108F));
 			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 788F));
-			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 46F));
+			this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 48F));
 			this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
 			this.tableLayoutPanel1.Controls.Add(this.panel11, 2, 2);
 			this.tableLayoutPanel1.Controls.Add(this.panel13, 3, 6);
@@ -3143,7 +3143,7 @@
 			this.panel14.Controls.Add(this.radioButton_pin10);
 			this.panel14.Controls.Add(this.radioButton_pin11);
 			this.panel14.Controls.Add(this.radioButton_pin12);
-			this.panel14.Location = new System.Drawing.Point(847, 11569);
+			this.panel14.Location = new System.Drawing.Point(847, 13855);
 			this.panel14.Name = "panel14";
 			this.panel14.Size = new System.Drawing.Size(109, 66);
 			this.panel14.TabIndex = 3;
@@ -3196,7 +3196,7 @@
 			this.panel29.AutoSize = true;
 			this.panel29.Controls.Add(this.radioButton_pin29);
 			this.panel29.Controls.Add(this.radioButton_pin30);
-			this.panel29.Location = new System.Drawing.Point(830, 11679);
+			this.panel29.Location = new System.Drawing.Point(830, 13965);
 			this.panel29.Name = "panel29";
 			this.panel29.Size = new System.Drawing.Size(67, 44);
 			this.panel29.TabIndex = 3;
@@ -3234,7 +3234,7 @@
 			this.label19.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.label19.AutoSize = true;
 			this.label19.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-			this.label19.Location = new System.Drawing.Point(828, 11445);
+			this.label19.Location = new System.Drawing.Point(816, 13731);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(29, 19);
 			this.label19.TabIndex = 3;
@@ -3259,7 +3259,7 @@
 			this.panel3.Controls.Add(this.radioInputPullup_dummy);
 			this.panel3.Controls.Add(this.radioInput_dummy);
 			this.panel3.Controls.Add(this.radioOutput_dummy);
-			this.panel3.Location = new System.Drawing.Point(120, 4710);
+			this.panel3.Location = new System.Drawing.Point(120, 6996);
 			this.panel3.Name = "panel3";
 			this.panel3.Size = new System.Drawing.Size(109, 66);
 			this.panel3.TabIndex = 3;
@@ -3313,7 +3313,7 @@
 			this.panel19.AutoSize = true;
 			this.panel19.Controls.Add(this.radioDigital_dummy);
 			this.panel19.Controls.Add(this.radioAnalog_dummy);
-			this.panel19.Location = new System.Drawing.Point(257, 4710);
+			this.panel19.Location = new System.Drawing.Point(257, 6996);
 			this.panel19.Name = "panel19";
 			this.panel19.Size = new System.Drawing.Size(67, 44);
 			this.panel19.TabIndex = 3;
@@ -3353,7 +3353,7 @@
 			this.panel26.AutoSize = true;
 			this.panel26.Controls.Add(this.labelValue_dummy);
 			this.panel26.Controls.Add(this.trackBar_dummy);
-			this.panel26.Location = new System.Drawing.Point(366, 4710);
+			this.panel26.Location = new System.Drawing.Point(366, 6996);
 			this.panel26.Name = "panel26";
 			this.panel26.Size = new System.Drawing.Size(364, 78);
 			this.panel26.TabIndex = 8;
