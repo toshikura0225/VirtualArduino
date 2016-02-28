@@ -117,7 +117,7 @@ void setup() {
   
   // 制御用シリアル通信開始
   // ▲▲▲時にボーレートは9600固定とする
-  eepBaudRateCode = EEPROM.read(two2one(HREGIST_EEP_INIT_DATA, LREGIST_EEP_BAUD_RATE_CODE));
+  //eepBaudRateCode = EEPROM.read(two2one(HREGIST_EEP_INIT_DATA, LREGIST_EEP_BAUD_RATE_CODE));
   // Serial.begin(code2baudrate(eepBaudRateCode));
   Serial.begin(9600);
 }
@@ -161,6 +161,7 @@ void loop() {
   
 }
 
+// 8バイト受信で受信完了とする
 // データを受信し、全データ受信完了か否かを戻り値で返す（ファンクションコードは0x03または0x06のみの対応）
 boolean dataReceive() {
   boolean flag = false;
@@ -210,21 +211,30 @@ boolean dataReceive() {
 // 通信データによる指令を反映する
 void request2board() {
   
-        int startAddress = two2one(readData[2], readData[3]);
-        int noOfPoints = two2one(readData[4], readData[5]);
+        int startAddress = two2one(readData[2], readData[3]);	// デバイスアドレス
+        int noOfPoints = two2one(readData[4], readData[5]);	// データ数
         
         int num, count = 0;  // temporary value
         
-        
+  // 自分宛てのデータであれば受信データを処理する      
   if (eepDeviceAddress == readData[0]) {
     
+    // 返答
     switch (readData[1]) {
+    	
+      // ファンクションコード0x03
       case 0x03:
+      	// デバイスアドレス
         Serial.write(readData[0]);
+        
+        // ファンクションコード0x03
         Serial.write(readData[1]);
+        
+        // データ数
         num = two2one(readData[4], readData[5]) * 2;
         Serial.write(num);
         
+        // 返信データ
         count = 0;
         while( count < two2one(readData[4], readData[5]) ) {
           
@@ -242,6 +252,7 @@ void request2board() {
         
       break;
       
+      // ファンクションコード0x06
       case 0x06:
         for(num = 0; num < 8; num++) {
           Serial.write(readData[num]);
@@ -252,7 +263,7 @@ void request2board() {
       break;
       
       default:
-      
+      	// 未対応
       break;
     }
   } else {
@@ -270,8 +281,6 @@ int two2one(byte b1 ,byte b2) { return (b1 * 256 + b2); };
 // レジスタの値を取得（存在しない場合は０を返答）
 int getRegisteredValue(int address) {
   
-
-
   int retValue = 0;
   byte addressH = highByte(address);
   byte addressL = lowByte(address);
@@ -395,7 +404,6 @@ int getRegisteredValue(int address) {
 
 // レジスタの値を設定
 void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) {
-  
 
   switch (addressH) {
       
@@ -429,7 +437,6 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
               digitalWrite(addressL, valueL);    // デジタル出力
             break;
             case ANALOG_MODE:
-              // DO NOTHING
               analogWrite(addressL, valueL);	// ＰＷＭ出力
               break;
             case OTHER_MODE:
