@@ -6,6 +6,8 @@
 
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
+#include <Wire.h>
+#include <SPI.h>
 
 const int SOFTWARE_NUMBER = 0;
 const int SOFTWARE_VERSION = 92;
@@ -34,6 +36,8 @@ const byte HREGIST_PIN_DATA = 1;                // ピン入出力値
 const byte HREGIST_SHIFT_OUTPUT_DATA = 2;       // シフト出力値
 const byte HREGIST_SHIFT_INPUT_DATA = 3;        // シフト入力値
 const byte HREGIST_SOFTWARE_SERIAL = 4;         // ソフトウェアシリアル設定
+const byte HREGIST_I2C = 5;                     // I2C
+const byte HREGIST_SPI = 6;                     // SPI
 const byte HREGIST_EEP_INIT_DATA = 10;          // 制御変数メモリ
 const byte HREGIST_EEP_GENERAL_DATA = 11;       // 汎用メモリ
 const byte HREGIST_SOFTWARE_NO_VER = 98;        // ソフトウエア
@@ -72,6 +76,7 @@ byte pinType[20] = { 255, 255, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE,
 
 int intData[20] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };         // 入出力データ
 
+// シフトレジスタ
 const byte LREGIST_SHIFT_PIN_1 = 0;    // 拡張ボード数，Latchピン
 const byte LREGIST_SHIFT_PIN_2 = 1;    // clock, dataピン
 const byte LREGIST_DATA_FROM = 2;      // データの先頭レジストリアドレス
@@ -120,6 +125,7 @@ void setup() {
   //eepBaudRateCode = EEPROM.read(two2one(HREGIST_EEP_INIT_DATA, LREGIST_EEP_BAUD_RATE_CODE));
   // Serial.begin(code2baudrate(eepBaudRateCode));
   Serial.begin(9600);
+  
 }
 
 // the loop routine runs over and over again forever:
@@ -502,6 +508,73 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
       }
       
     break;
+    
+    case HREGIST_I2C:
+    Serial.write("HREGIST_I2C  ");
+      switch (addressL)
+      {
+        case 0:
+          Wire.begin(); // I2Cバスに接続
+          break;
+          
+        case 1:
+          Wire.beginTransmission(valueH);               // アドレスを7バイト換算
+          Wire.write(0x06);				// I/O direction(ic0)
+          Wire.write(valueL);				// ic0 directon
+          Wire.endTransmission();		// 送信        
+          break;
+
+        case 2:
+          Wire.beginTransmission(valueH);               // アドレスを7バイト換算
+          Wire.write(0x07);				// I/O direction(ic0)
+          Wire.write(valueL);				// ic0 directon
+          Wire.endTransmission();		// 送信        
+          break;
+          
+        case 3:
+          Wire.beginTransmission(valueH);
+          Wire.write(0x02);
+          Wire.write(valueL);
+          Wire.endTransmission();
+          break;
+          
+        case 4:
+          Wire.beginTransmission(valueH);
+          Wire.write(0x03);
+          Wire.write(valueL);
+          Wire.endTransmission();
+          break;         
+          
+      }
+      
+      break;
+      
+    case HREGIST_SPI:
+    
+      switch (addressL)
+      {
+        case 0:
+          
+          break;
+          
+        case 1:
+          //SPI.setDataMode(SPI_MODE0);
+          //SPI.setClockDivider(SPI_CLOCK_DIV32);
+          SPI.setDataMode(valueH);
+          SPI.setClockDivider(valueL);
+          break;
+        
+        case 2:
+          SPI.transfer(valueH);
+          SPI.transfer(valueL);
+          break;
+          
+        case 3:
+          SPI.transfer(valueL);
+          
+      }
+    
+      break;
     
     case HREGIST_SOFTWARE_SERIAL:
       // ソフトウェアシリアル
