@@ -519,79 +519,54 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
       }
       
     break;
-    
-    case HREGIST_I2C:
-    Serial.write("HREGIST_I2C  ");
-      switch (addressL)
-      {
-        case 0:
-          Wire.begin(); // I2Cバスに接続
-          break;
-          
-        case 1:
-          Wire.beginTransmission(valueH);               // アドレスを7バイト換算
-          Wire.write(0x06);				// I/O direction(ic0)
-          Wire.write(valueL);				// ic0 directon
-          Wire.endTransmission();		// 送信        
-          break;
 
-        case 2:
-          Wire.beginTransmission(valueH);               // アドレスを7バイト換算
-          Wire.write(0x07);				// I/O direction(ic0)
-          Wire.write(valueL);				// ic0 directon
-          Wire.endTransmission();		// 送信        
-          break;
-          
-        case 3:
-          Wire.beginTransmission(valueH);
-          Wire.write(0x02);
-          Wire.write(valueL);
-          Wire.endTransmission();
-          break;
-          
-        case 4:
-          Wire.beginTransmission(valueH);
-          Wire.write(0x03);
-          Wire.write(valueL);
-          Wire.endTransmission();
-          break;         
-          
-      }
-      
-      break;
-      
     case HREGIST_SPI:
-    
       switch (addressL)
       {
-        case 0:
-          
+        case LREGIST_SPI_BEGIN:
+          SPI.begin();
           break;
           
-        case 1:
-          //SPI.setDataMode(SPI_MODE0);
-          //SPI.setClockDivider(SPI_CLOCK_DIV32);
+        case LREGIST_SPI_SETTING:
           SPI.setDataMode(valueH);
           SPI.setClockDivider(valueL);
           break;
         
-        case 2:
-          SPI.transfer(valueH);
+        case LREGIST_SPI_TRANSFER:
           SPI.transfer(valueL);
           break;
-          
-        case 3:
-          SPI.transfer(valueL);
-          
       }
     
       break;
     
+    case HREGIST_I2C:
+      switch (addressL)
+      {
+        case LREGIST_I2C_BEGIN:
+          Wire.begin(); // I2Cバスに接続
+          break;
+          
+        case LREGIST_I2C_BEGINTRANS:
+          Wire.beginTransmission(valueL);
+          break;
+
+        case LREGIST_I2C_WRITE:
+          Wire.write(valueL);
+          break;
+          
+        case LREGIST_I2C_ENDTRANS:
+          Wire.endTransmission();
+          break;          
+      }
+      
+      break;
+      
+   
     case HREGIST_SOFTWARE_SERIAL:
       // ソフトウェアシリアル
       pinSoftwareSerial_RX = valueH;
       pinSoftwareSerial_TX = valueL;
-    break;
+      break;
     
     case HREGIST_EEP_INIT_DATA:
       // 制御変数メモリ
@@ -616,16 +591,26 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
       EEPROM.write(two2one(addressH, addressL), valueL);
       eepGeneralStrageArea[addressL] = valueL;    // 汎用メモリ
       // ▲▲▲ 保留（実際はEEPROMへ記憶）
-    break;
+      break;
+
+    case HREGIST_COM:
+
+      switch (addressL)
+      {
+        case LREGIST_COM_DELAY:
+          delay(two2one(valueH, valueL));   // delay関数を実行
+          break;
+      }
+      break;
     
     case HREGIST_INIT:
       // ▲▲▲ 保留（実際は初期値でEEPROMを書き換え＆変数も初期値に）
-    break;
+      break;
     
     default:
       // 登録なし
       
-    break;
+      break;
       
   }
 }
