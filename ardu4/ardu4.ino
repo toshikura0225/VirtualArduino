@@ -36,10 +36,11 @@ const byte HREGIST_PIN_DATA = 1;                // ピン入出力値
 const byte HREGIST_SHIFT_OUTPUT_DATA = 2;       // シフト出力値
 const byte HREGIST_SHIFT_INPUT_DATA = 3;        // シフト入力値
 const byte HREGIST_SOFTWARE_SERIAL = 4;         // ソフトウェアシリアル設定
-const byte HREGIST_I2C = 5;                     // I2C
-const byte HREGIST_SPI = 6;                     // SPI
+const byte HREGIST_SPI = 5;                     // SPI
+const byte HREGIST_I2C = 6;                     // I2C
 const byte HREGIST_EEP_INIT_DATA = 10;          // 制御変数メモリ
 const byte HREGIST_EEP_GENERAL_DATA = 11;       // 汎用メモリ
+const byte HREGIST_COM = 12;                    // 汎用実行（書込みで関数＊＊を実行する）
 const byte HREGIST_SOFTWARE_NO_VER = 98;        // ソフトウエア
 const byte HREGIST_INIT = 99;                   // 書き込むと初期化する領域
 /*
@@ -54,29 +55,20 @@ int pinDirection[20] = { INPUT, INPUT, INPUT, INPUT, INPUT,
                           INPUT, INPUT, INPUT, INPUT, INPUT };  // pinMode設定値
 
 
-// ピンの設定
+// ■■■　入出力方向値　■■■
 const byte DIGITAL_MODE = 0;            // デジタルピン
 const byte ANALOG_MODE = 1;             // アナログピン
 const byte OTHER_MODE = 2;              // その他制御モード
-/*
-const byte SOFTWARE_SERIAL_RX_MODE = 3; // ソフトウェアシリアル送信ピン
-const byte SOFTWARE_SERIAL_TX_MODE = 4; // ソフトウェアシリアル受信ピン
-const byte SHIFT_OUTPUT_LATCH_MODE = 5;      // シフト出力ピン
-const byte SHIFT_OUTPUT_CLOCK_MODE = 6;      // 〃
-const byte SHIFT_OUTPUT_DATA_MODE = 7;       // 〃
-const byte SHIFT_INPUT_LATCH_MODE = 8;       // シフト入力ピン
-const byte SHIFT_INPUT_CLOCK_MODE = 9;       // 〃
-const byte SHIFT_INPUT_DATA_MODE = 10;       // 〃
-*/
 
 byte pinType[20] = { 255, 255, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, 
                     DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, 
                     DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, ANALOG_MODE, 
                     ANALOG_MODE, ANALOG_MODE, ANALOG_MODE, ANALOG_MODE, ANALOG_MODE };    // 入出力モード
 
+// ■■■　入出力データ値　■■■
 int intData[20] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };         // 入出力データ
 
-// シフトレジスタ
+// ■■■　シフトレジスタ　■■■
 const byte LREGIST_SHIFT_PIN_1 = 0;    // 拡張ボード数，Latchピン
 const byte LREGIST_SHIFT_PIN_2 = 1;    // clock, dataピン
 const byte LREGIST_DATA_FROM = 2;      // データの先頭レジストリアドレス
@@ -88,6 +80,24 @@ byte numberOfShiftInputBoard = 2;     // シフト入力拡張ボード数（▲
 byte pinInputLatch=5, pinInputClock=6, pinInputData=7;      // シフト入力制御ピン
 byte shiftInputData[3] = { 0, 0, 0 };      // シフト入力データ
 
+// ■■■　ソフトウェアシリアル　■■■
+SoftwareSerial softwareSerial(2, 3);      // ソフトウェアシリアル
+byte pinSoftwareSerial_RX;      // 受信ピン
+byte pinSoftwareSerial_TX;      // 送信ピン
+
+// ■■■　SPI　■■■
+const byte LREGIST_SPI_BEGIN = 0;     // 書込みでSPI.begin()を実行する
+const byte LREGIST_SPI_SETTING = 1;   // 書込みでSPI.setDataMode()とSPI.setClockDivider()を実行する
+const byte LREGIST_SPI_TRANSFER = 2;  // 書込みでSPI.transfer()を実行する
+
+// ■■■　I2C　■■■
+const byte LREGIST_I2C_BEGIN = 0;     // 書込みでI2C.begin()を実行する
+const byte LREGIST_I2C_BEGINTRANS = 1;// 書込みでI2C.beginTransmission()を実行する
+const byte LREGIST_I2C_WRITE = 2;     // 書込みでI2C.write()を実行する
+const byte LREGIST_I2C_ENDTRANS = 3;  // 書込みでI2C.endTransmission()を実行する
+
+
+// ■■■　プログラム設定（不揮発）　■■■
 const byte LREGIST_EEP_DEVICE_ADDRESS = 0;             // デバイスアドレス
 const byte LREGIST_EEP_BAUD_RATE_CODE = 1;             // (通常)シリアルのボーレート
 const byte LREGIST_EEP_SOFTWARE_SERIAL_BAUD_RATE = 2;  // ソフトウェアシリアルのボーレート
@@ -97,13 +107,14 @@ byte eepBaudRateCode = 4;                      // (通常)シリアルのボー�
 byte eepSoftwareSerialBaudRateCode  = 4;       // ソフトウェアシリアルのボーレート
 byte eepTimeoutCount = 15;                      // タイムアウトカウント値（×１０００）
 
+// ■■■　不揮発メモリ　■■■
 byte eepGeneralStrageArea[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  // 汎用EEPROMデータ
 
-SoftwareSerial softwareSerial(2, 3);      // ソフトウェアシリアル
-byte pinSoftwareSerial_RX;		  // 受信ピン
-byte pinSoftwareSerial_TX;		  // 送信ピン
+// ■■■　汎用　■■■
+const byte LREGIST_COM_DELAY = 0;   // 書込みでdelay()を実行する
 
-const int MAX_READ_SIZE = 1024;      // 受信データ最大サイズ
+
+const int MAX_READ_SIZE = 32;      // 受信データ最大サイズ
 byte readData[MAX_READ_SIZE];        // 受信データ
 int readLength = 0;                  // 受信データサイズ
 
