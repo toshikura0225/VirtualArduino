@@ -1,4 +1,4 @@
-﻿/*
+/*
 ＜修正事項＞Q
 ・INPUT_PULLUPに対応（現在はpiModeはbool型のためINPUT_PULLUP(=2)を使用できない）
 ・7WSEGを読む機能
@@ -268,6 +268,8 @@ void request2board() {
 
 			// ファンクションコード0x03
 			case 0x03:
+                        {
+
 				// デバイスアドレス
 				Serial.write(readData[0]);
 
@@ -276,6 +278,7 @@ void request2board() {
 
 				// データ数
 				int byte_count = two2one(readData[4], readData[5]) * 2;
+
 				Serial.write(byte_count);
 
 				// 返信データ
@@ -290,13 +293,14 @@ void request2board() {
 					//getRegisteredValue(readData[2], readData[3]);
 					count++;
 				}
-
+ 
 				// CRCコード送信
 				int CRC = GetCRC(readData, byte_count + 3);
 				Serial.write(CRC & 255);
 				Serial.write((CRC >> 8) & 255);
 
 				break;
+                        }
 
 				// ファンクションコード0x06
 			case 0x06:
