@@ -136,7 +136,8 @@ void setup() {
 	// ▲▲▲時にボーレートは9600固定とする
 	//eepBaudRateCode = EEPROM.read(two2one(HREGIST_EEP_INIT_DATA, LREGIST_EEP_BAUD_RATE_CODE));
 	// Serial.begin(code2baudrate(eepBaudRateCode));
-	Serial.begin(9600);
+  //Serial.begin(9600);
+  Serial.begin(57600);
 
 }
 
