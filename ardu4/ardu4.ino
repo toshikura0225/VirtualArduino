@@ -582,7 +582,7 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
 					break;
 
         case LREGIST_I2C_READ:
-          Wire.requestFrom((int)valueL, 1);  // 受信は1バイト固定
+          Wire.requestFrom((int)valueL, 1);  // 受信は1バイト固定（Modubusのデータ長部分にアドレスを指定）
           //while (Wire.available())   // slave may send less than requested
           responseData = Wire.read(); // receive a byte as character
           break;
