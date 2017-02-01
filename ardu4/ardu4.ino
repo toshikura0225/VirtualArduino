@@ -96,6 +96,7 @@ const byte LREGIST_I2C_BEGIN = 0;     // 書込みでI2C.begin()を実行する
 const byte LREGIST_I2C_BEGINTRANS = 1;// 書込みでI2C.beginTransmission()を実行する
 const byte LREGIST_I2C_WRITE = 2;     // 書込みでI2C.write()を実行する
 const byte LREGIST_I2C_ENDTRANS = 3;  // 書込みでI2C.endTransmission()を実行する
+const byte LREGIST_I2C_READ = 4;      // 読み込みでWire.requestFrom( , )とWire.read()とを実行する
 
 
 									  // ■■■　プログラム設定（不揮発）　■■■
@@ -252,7 +253,7 @@ int GetCRC(byte bytes[], int checkLength)
 	return CRC;
 }
 
-
+byte responseData = 0;
 // 通信データによる指令を反映する
 void request2board() {
 
@@ -269,39 +270,22 @@ void request2board() {
 
 			// ファンクションコード0x03
 			case 0x03:
-                        {
 
-				// デバイスアドレス
-				Serial.write(readData[0]);
-
-				// ファンクションコード0x03
-				Serial.write(readData[1]);
-
-				// データ数
-				int byte_count = two2one(readData[4], readData[5]) * 2;
-
-				Serial.write(byte_count);
-
-				// 返信データ
-				count = 0;
-				while (count < two2one(readData[4], readData[5])) {
-
-					int value = getRegisteredValue(two2one(readData[2], readData[3]) + count);
-
-					Serial.write(highByte(value));
-					Serial.write(lowByte(value));
-					//Serial.write(lowByte(getRegisteredValue(two2one(readData[2], readData[3])+count)));
-					//getRegisteredValue(readData[2], readData[3]);
-					count++;
-				}
- 
+        setRegisteredValue(readData[2], readData[3], readData[4], readData[5]);
+				
+				Serial.write(readData[0]);  // デバイスアドレス
+        Serial.write(readData[1]);  // ファンクションコード0x03
+        Serial.write(2);            // バイトカウント
+        Serial.write(0x00);         // データ
+        Serial.write(responseData);
+        
 				// CRCコード送信
-				int CRC = GetCRC(readData, byte_count + 3);
-				Serial.write(CRC & 255);
-				Serial.write((CRC >> 8) & 255);
-
+				//int CRC = GetCRC(readData, byte_count + 3);
+			  //Serial.write(CRC & 255);
+				//Serial.write((CRC >> 8) & 255);
+        Serial.write(0xAA);
+        Serial.write(0xAA);
 				break;
-                        }
 
 				// ファンクションコード0x06
 			case 0x06:
@@ -596,6 +580,12 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
 				case LREGIST_I2C_ENDTRANS:
 					Wire.endTransmission();
 					break;
+
+        case LREGIST_I2C_READ:
+          Wire.requestFrom((int)valueL, 1);  // 受信は1バイト固定
+          //while (Wire.available())   // slave may send less than requested
+          responseData = Wire.read(); // receive a byte as character
+          break;
 			}
 
 			break;
