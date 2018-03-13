@@ -1,7 +1,0 @@
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\bin\Release\ArduinoDrive.exe
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\bin\Release\ArduinoDrive.pdb
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\obj\x86\Release\ArduinoDrive.Form1.resources
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\obj\x86\Release\ArduinoDrive.Properties.Resources.resources
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\obj\x86\Release\ArduinoDrive.csproj.GenerateResource.Cache
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\obj\x86\Release\ArduinoDrive.exe
-C:\Users\T8111009\AppData\Local\Temporary Projects\ArduinoDrive\obj\x86\Release\ArduinoDrive.pdb
