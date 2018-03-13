@@ -58,7 +58,9 @@ INPUT, INPUT, INPUT, INPUT, INPUT };  // pinMode設定値
 									  // ■■■　入出力方向値　■■■
 const byte DIGITAL_MODE = 0;            // デジタルピン
 const byte ANALOG_MODE = 1;             // アナログピン
-const byte OTHER_MODE = 2;              // その他制御モード
+const byte ONE_PULSE_LHL_MODE = 2;      // １波形出力  Low→High→Low
+const byte ONE_PULSE_HLH_MODE = 3;      // １波形出力  High→Low→High
+const byte OTHER_MODE = 4;              // その他制御モード
 
 byte pinType[20] = { 255, 255, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE,
 DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE, DIGITAL_MODE,
@@ -104,7 +106,7 @@ const byte LREGIST_EEP_DEVICE_ADDRESS = 0;             // デバイスアドレ�
 const byte LREGIST_EEP_BAUD_RATE_CODE = 1;             // (通常)シリアルのボーレート
 const byte LREGIST_EEP_SOFTWARE_SERIAL_BAUD_RATE = 2;  // ソフトウェアシリアルのボーレート
 const byte LREGIST_EEP_TIMEOUT_COUNT = 3;              // タイムアウトカウント値（×１０００）
-byte eepDeviceAddress = 0;                     // デバイスアドレス
+byte eepDeviceAddress = 1;                     // デバイスアドレス
 byte eepBaudRateCode = 4;                      // (通常)シリアルのボーレート
 byte eepSoftwareSerialBaudRateCode = 4;       // ソフトウェアシリアルのボーレート
 byte eepTimeoutCount = 15;                      // タイムアウトカウント値（×１０００）
@@ -445,42 +447,66 @@ void setRegisteredValue(byte addressH, byte addressL, byte valueH, byte valueL) 
 
 		case HREGIST_PIN_CONFIG:
 			// pinMode設定値，ピンタイプ
-			if (addressL <= 19 && valueH < 3) {
-				// アナログピンのピン番号対策
+			//if (addressL <= 19 && valueH < 3) {
+			// アナログピンのピン番号対策
 
-				//if (pinDirection[addressL] != valueH) {
-				// pinMode設定値が現設定と異なる
-				pinDirection[addressL] = valueH;
-				pinMode(addressL, valueH);
-				//}
+			//if (pinDirection[addressL] != valueH) {
+			// pinMode設定値が現設定と異なる
+			pinDirection[addressL] = valueH;
+			pinMode(addressL, valueH);
+			//}
 
-				//if (pinType[addressL] != valueL) {
-				// ピンタイプが現設定と異なる
-				pinType[addressL] = valueL;
-				//}
-			}
+			//if (pinType[addressL] != valueL) {
+			// ピンタイプが現設定と異なる
+			pinType[addressL] = valueL;
+			//}
+			//}
+      switch(valueL)
+      {
+        case DIGITAL_MODE:
+        case ANALOG_MODE:
+          // 方向設定時の出力は不定。Arduinoの仕様に任せる
+          break;
+
+        case ONE_PULSE_LHL_MODE:
+          // パルスモードを設定時に初期値としてLow出力とする
+          digitalWrite(addressL, LOW);
+          break;
+
+        case ONE_PULSE_HLH_MODE:
+          // パルスモードを設定時に初期値としてHigh出力とする
+          digitalWrite(addressL, HIGH);
+          break;
+      }
 			break;
 
 		case HREGIST_PIN_DATA:
 			// ピンデータ
-			if (valueH != 1) {
-				//if (intData[addressL] != valueL) {
+			intData[addressL] = valueL;
 
-				intData[addressL] = valueL;
+			switch (pinType[addressL]) {
+				case DIGITAL_MODE:
+					digitalWrite(addressL, valueL);    // デジタル出力
+					break;
+				case ANALOG_MODE:
+					analogWrite(addressL, valueL);	// ＰＷＭ出力
+					break;
+        case ONE_PULSE_LHL_MODE:
+          digitalWrite(addressL, HIGH);
+          delay(two2one(valueH, valueL));
+          digitalWrite(addressL, LOW);
+          break;
 
-				switch (pinType[addressL]) {
-					case DIGITAL_MODE:
-						digitalWrite(addressL, valueL);    // デジタル出力
-						break;
-					case ANALOG_MODE:
-						analogWrite(addressL, valueL);	// ＰＷＭ出力
-						break;
-					case OTHER_MODE:
-						// DO NOTHING
-					default:
-						break;
-				}
-				//}
+        case ONE_PULSE_HLH_MODE:
+          digitalWrite(addressL, LOW);
+          delay(two2one(valueH, valueL));
+          digitalWrite(addressL, HIGH);
+          break;
+          
+				case OTHER_MODE:
+					// DO NOTHING
+				default:
+					break;
 			}
 			break;
 
